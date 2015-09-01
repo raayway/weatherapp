@@ -9,7 +9,7 @@
         Title="Погода" Height="650" Width="525"
         BorderBrush="{DynamicResource AccentColorBrush}"
         BorderThickness="1"
-        WindowStartupLocation="CenterScreen" Icon="Icons/Slight Drizzle(2).png" ResizeMode="CanResizeWithGrip" Closing="MetroWindow_Closing">
+        WindowStartupLocation="CenterScreen" Icon="Icons/Slight Drizzle(2).png" ResizeMode="CanResizeWithGrip" Closing="MetroWindow_Closing" Loaded="MetroWindow_Loaded">
     <Controls:MetroWindow.Background>
         <ImageBrush ImageSource="Icons/clear-sky-silhouette-star-nature-1920x1080-wallpaper29968.jpg" Stretch="UniformToFill"/>
     </Controls:MetroWindow.Background>
@@ -142,7 +142,7 @@
             </Popup>-->
                         <Button Grid.Column="1" Name="btnSearch" FontFamily="Segoe UI" Content="Поиск" Width="75" Margin="0,10,10,10" Click="btnSearch_Click" Style="{StaticResource SquareButtonStyle}" BorderBrush="{x:Null}" Background="#FFE6E4E4"/>
                     </Grid>
-                    <ListBox Background="#FFE6E4E4" x:Name="citiesList" Visibility="Collapsed" Margin="20,-10,10,0" ScrollViewer.CanContentScroll="True" Width="{Binding Path=tbSearch}" HorizontalAlignment="Left" ScrollViewer.IsDeferredScrollingEnabled="True" ScrollViewer.VerticalScrollBarVisibility="Auto" MouseDoubleClick="citiesList_MouseDoubleClick" GotFocus="citiesList_GotFocus" LostFocus="citiesList_LostFocus"/>
+                    <ListBox Background="#FFE6E4E4" x:Name="citiesList" Visibility="Collapsed" Margin="20,-10,10,0" ScrollViewer.CanContentScroll="True" Width="400" HorizontalAlignment="Left" ScrollViewer.IsDeferredScrollingEnabled="True" ScrollViewer.VerticalScrollBarVisibility="Auto" MouseDoubleClick="citiesList_MouseDoubleClick" GotFocus="citiesList_GotFocus" LostFocus="citiesList_LostFocus"/>
 
                     <Label Name="lblLocation" FontFamily="Segoe UI Light" HorizontalAlignment="Center" HorizontalContentAlignment="Center" Content="" FontSize="22" Foreground="White"/>
                     <Label Name="lblDate" FontFamily="Segoe UI Light" HorizontalAlignment="Center" HorizontalContentAlignment="Center" Content="" FontSize="18" Margin="0 -10 0 0" Foreground="White"/>
@@ -160,6 +160,7 @@
                     <Label Name="lblWind" FontFamily="Segoe UI Light" Content="" HorizontalAlignment="Center" FontSize="16" HorizontalContentAlignment="Center" Margin="0,-15,0,0" Foreground="White"/>
                     <Label Name="lblPressure" FontFamily="Segoe UI Light" Content="" HorizontalAlignment="Center" FontSize="16" HorizontalContentAlignment="Center" Margin="0,-15,0,0" Foreground="White"/>
                     <Label Name="lblSunsetSunrise" FontFamily="Segoe UI Light" Content="" HorizontalAlignment="Center" FontSize="16" HorizontalContentAlignment="Center" Margin="0,-15,0,0" Foreground="White"/>
+                    <Button Name="btnTest" Click="btnTest_Click"/>
                 </StackPanel>
 
             </TabItem>

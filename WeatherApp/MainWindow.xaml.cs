@@ -22,7 +22,7 @@ using System.Net;
 using System.Diagnostics;
 using System.IO;
 using System.Net.NetworkInformation;
-
+using GeoDataSource;
 namespace WeatherApp
 {
     /// <summary>
@@ -43,13 +43,7 @@ namespace WeatherApp
 
             CheckInternetConnection();
 
-            reader = new StreamReader("city.list.json");
-            CitiesList = new List<City>();
-
-            while (!reader.EndOfStream)
-            {
-                CitiesList.Add(JsonHelper.JsonDeserialize<City>(reader.ReadLine()));
-            }
+            
 
            // MessageBox.Show(CitiesList.Count.ToString());
 
@@ -136,9 +130,13 @@ namespace WeatherApp
                 citiesList.Visibility = Visibility.Collapsed;
                 if (tbSearch.Text != string.Empty)
                 {
-                    
-                    GetCurrentWeatherByName();
-                    tbSearch.Clear();
+
+                    //GetCurrentWeatherByName();
+                    //tbSearch.Clear();
+                    City city = CitiesList.First<City>(c => c.Name == tbSearch.Text);
+                    MessageBox.Show(city.Name + city.Country);
+
+
                 }
                 else
                     MessageBox.Show("Введите город");
@@ -375,19 +373,6 @@ namespace WeatherApp
             
         }
 
-        //private void btnTest_Click(object sender, RoutedEventArgs e)
-        //{
-        //    try
-        //    {
-        //        SendWeatherNotify();
-        //    }
-        //    catch (Exception ex)
-        //    {
-
-        //        MessageBox.Show(ex.Message);
-        //    }
-            
-        //}
 
         private void cbNotification_IsCheckedChanged(object sender, EventArgs e)
         {
@@ -401,63 +386,83 @@ namespace WeatherApp
         {
             Process.GetCurrentProcess().Kill();
         }
-
+        XDocument doc;
         void Init()
         {
-            tbSearch.TextChanged += (sender, e) =>
+            try
             {
-                citiesList.Visibility = Visibility.Visible;
-                citiesList.Items.Clear();
+                tbSearch.TextChanged += (sender, e) =>
+                {
+                    citiesList.Visibility = Visibility.Visible;
+                    citiesList.Items.Clear();
+
+                    var path = "http://api.geonames.org/search?name_startsWith=" + tbSearch.Text + "&maxRows=15&username=rayway";
+                    doc = XDocument.Load(path);
+
+                    foreach (var item in doc.Elements())
+                    {
+                        citiesList.Items.Add(item.Element("geoname").Element("name").Value);
+                    }
+                    if (citiesList.Items.Count == 0) citiesList.Visibility = Visibility.Collapsed;
+
+                };
+
+                tbSearch.LostFocus += (sender, e) =>
+                {
+                    citiesList.Visibility = Visibility.Collapsed;
+                };
+
+                tbSearch.GotFocus += (sender, e) =>
+                {
+                    if (tbSearch.Text == string.Empty)
+                        citiesList.Visibility = Visibility.Collapsed;
+                };
+
+            }
+            catch (Exception ex)
+            {
+
+                MessageBox.Show(ex.Message);
+
+            }
+            
+                //citiesList.Items.Add(doc.Element("geonames").Element("geoname").Element("name").Value);
+
+
+
                 //if(citiesList.Items.Count < 15)
                 //    CitiesList.FindAll(item => item.Name.Contains(tbSearch.Text)).ForEach(city => citiesList.Items.Add(string.Format("{0}, {1}", city.Name, city.Country)));
-                
+
                 //foreach (var city in CitiesList.FindAll(item => item.Name.Contains(tbSearch.Text)))
                 //{
                 //    if (citiesList.Items.Count < 55)
                 //        citiesList.Items.Add(string.Format("{0}, {1}", city.Name, city.Country));
                 //}
 
-                
-
-                foreach (var city in CitiesList)
-                {
-                    if(city.Name.StartsWith(tbSearch.Text) || city.Name.Contains(tbSearch.Text))
-                    {
-                        if(citiesList.Items.Count < 5)
-                            citiesList.Items.Add(string.Format("{0}, {1}", city.Name, city.Country));
-                    }
-                }
 
 
-
-                if (citiesList.Items.Count == 0) citiesList.Visibility = Visibility.Collapsed;
-
-            };
-
-            tbSearch.LostFocus += (sender, e) =>
-            {
-                citiesList.Visibility = Visibility.Collapsed;
-            };
-
-            tbSearch.GotFocus += (sender, e) =>
-            {
-                if (tbSearch.Text == string.Empty)
-                    citiesList.Visibility = Visibility.Collapsed;
-            };
+                //foreach (var city in CitiesList)
+                //{
+                //    if(city.Name.StartsWith(tbSearch.Text) || city.Name.Contains(tbSearch.Text))
+                //    {
+                //        if(citiesList.Items.Count < 5)
+                //            citiesList.Items.Add(string.Format("{0}, {1}", city.Name, city.Country));
+                //    }
+                //}    
         }
 
         private void citiesList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             try
             {
-                string location = citiesList.SelectedItem.ToString();
+                //string location = citiesList.SelectedItem.ToString();
 
-                string city, country;
-                int comaIndex = location.IndexOf(',');
-                country = location.Substring(comaIndex + 1);
-                city = location.Remove(comaIndex + 1);
+                //string city, country;
+                //int comaIndex = location.IndexOf(',');
+                //country = location.Substring(comaIndex + 1);
+                //city = location.Remove(comaIndex + 1); 
 
-                City cityFound = CitiesList.Single<City>(c => c.Name == city | c.Country == country);
+                City cityFound = CitiesList.Single<City>(c => c.Name == "Mykolaiv" | c.Country == "Ua");
 
                 GetWeatherForCityId(cityFound.Id);
 
@@ -562,6 +567,35 @@ namespace WeatherApp
             {
                 MessageBox.Show("Подключение к интернету отсутсвует");
             }
+        }
+
+
+        void ShowMap()
+        {
+            browser.Navigate("http://openweathermap.org/Maps?zoom=12&lat=50.01&lon=36.27&layers=B0FTTFF");
+        }
+
+        private void btnTest_Click(object sender, RoutedEventArgs e)
+        {
+            ShowMap();
+        }
+        //JsonHelper json;
+        private void MetroWindow_Loaded(object sender, RoutedEventArgs e)
+        {
+            //reader = new StreamReader("city.list.json");
+            //CitiesList = new List<City>();
+
+            //while (!reader.EndOfStream)
+            //{
+            //    CitiesList.Add(JsonHelper.JsonDeserialize<City>(reader.ReadLine()));
+            //}
+
+           // json = new JsonHelper();
+            
+            //CitiesList = new List<City>();
+            //CitiesList.Add(JsonHelper.JsonDeserialize("city.list.json"));
+
+            
         }
     }
 }
